@@ -5,8 +5,8 @@ const db = require("./db.js");
 require("dotenv").config();
 
 let initial_col = process.env.initial_col;
-let offsetMax = 5;
-let offsetIncr = 1;
+let offsetMax = 8;
+let offsetIncr = 2;
 let offset = 0;
 
 const client = new tmi.Client({
@@ -52,10 +52,13 @@ function changeColour() {
     if (changingColour) return;
 
     changingColour = true;
-    setTimeout(() => {
+    /*setTimeout(() => {
         client.say(`#${process.env.ttv_username}`, `/color #${calcNewColour()}`)
-        changingColour = false;       
-    }, 1500)
+        changingColour = false;
+    }, 0)
+    */
+    client.say(`#${process.env.ttv_username}`, `/color #${calcNewColour()}`)
+    changingColour = false;
 }
 
 function calcNewColour() {
