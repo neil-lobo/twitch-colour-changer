@@ -4,10 +4,13 @@ const { channel } = require('tmi.js/lib/utils');
 const db = require("./db.js");
 require("dotenv").config();
 
-let initial_col = process.env.initial_col;
-let offsetMax = 8;
-let offsetIncr = 2;
-let offset = 0;
+const STEPS_RANGE = 13;
+let dir = 1;
+let step = 0;
+let gradient = {
+    start: [111,191,242],
+    end: [144,111,242]
+}
 
 const client = new tmi.Client({
     options: {
@@ -40,41 +43,31 @@ client.on("message", (channel, state, message, self) => {
             break;
         case "stop":
             client.say(process.env.ttv_username, `Stopping`)
-            client.say(process.env.ttv_username, `/color #${initial_col}`)
+            client.say(process.env.ttv_username, `/color #${process.env.initial_col}`)
             client.disconnect();
             break;
     }
 
 });
 
-let changingColour = false;
 function changeColour() {
-    if (changingColour) return;
-
-    changingColour = true;
-    /*setTimeout(() => {
-        client.say(`#${process.env.ttv_username}`, `/color #${calcNewColour()}`)
-        changingColour = false;
-    }, 0)
-    */
-    client.say(`#${process.env.ttv_username}`, `/color #${calcNewColour()}`)
-    changingColour = false;
-}
-
-function calcNewColour() {
-    let colour = convert.hex.hsl(initial_col);
-
-    if (Math.abs(offsetIncr + offset) > offsetMax) {
-        offsetIncr = -offsetIncr;
+    let val = step/(STEPS_RANGE-1);
+    let colour = [0,0,0]
+    for(let i of [0,1,2]) {
+        colour[i] = gradient.start[i] + val * (gradient.end[i] - gradient.start[i])
+    }
+    step+= dir;
+    if (step >= STEPS_RANGE-1 || step <= 0) {
+        dir *= -1;
     }
 
-    offset += offsetIncr;
-    colour[2] += offset;
+    let colourHex = "";
+    for(let i of [0,1,2]) {
+        colourHex += Math.round(colour[i]).toString(16)
+    }
+    console.log(`#${colourHex}`)
 
-    inlineLog(`${offsetIncr} | ${offset} | ${offsetMax}`);
-
-    return convert.hsl.hex(colour[0], colour[1], colour[2])
-
+    client.say(process.env.ttv_username, `/color #${colourHex}`)
 }
 
 function inlineLog(str) {
