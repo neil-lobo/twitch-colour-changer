@@ -4,12 +4,15 @@ const { channel } = require('tmi.js/lib/utils');
 const db = require("./db.js");
 require("dotenv").config();
 
+const startHex = process.env.start_col;
+const endHex = process.env.end_col;
+
 const STEPS_RANGE = 13;
 let dir = 1;
 let step = 0;
 let gradient = {
-    start: [111,191,242],
-    end: [144,111,242]
+    start: [parseInt(startHex.slice(0,2), 16),parseInt(startHex.slice(2,4), 16),parseInt(startHex.slice(4,6), 16)],
+    end: [parseInt(endHex.slice(0,2), 16),parseInt(endHex.slice(2,4), 16),parseInt(endHex.slice(4,6), 16)]
 }
 
 const client = new tmi.Client({
