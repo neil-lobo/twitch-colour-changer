@@ -7,7 +7,7 @@ require("dotenv").config();
 const startHex = process.env.start_col;
 const endHex = process.env.end_col;
 
-const STEPS_RANGE = 13;
+const STEPS_RANGE = process.env.steps;
 let dir = 1;
 let step = 0;
 let gradient = {
@@ -66,7 +66,11 @@ function changeColour() {
 
     let colourHex = "";
     for(let i of [0,1,2]) {
-        colourHex += Math.round(colour[i]).toString(16)
+        let byte = Math.round(colour[i]).toString(16);
+        if (byte.length == 1) {
+            colourHex += "0"
+        }
+        colourHex += byte
     }
     console.log(`#${colourHex}`)
 
